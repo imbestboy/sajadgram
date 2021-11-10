@@ -1,0 +1,15 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title %} {{request.user.username}}'s Timeline {% endblock title %}
+
+{% block content-header %}
+TimeLine
+{% endblock content-header %}
+
+{% block content %}
+<div class="alert alert-warning alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <h5><i class="icon fas fa-exclamation-triangle"></i>404 , post section not found !</h5>
+    if you are developer please implement post section
+</div>
+{% endblock content %}

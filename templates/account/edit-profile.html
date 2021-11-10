@@ -1,0 +1,250 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block title %}
+SajadGram | Edit Profile
+{% endblock title %}
+
+
+{% block content-header %}
+Edit Profile
+{% endblock content-header %}
+
+
+{% block content %}
+
+{% if form.non_field_errors %}
+
+
+<div class="card card-danger">
+    <div class="card-header">
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i>
+            </button>
+        </div>
+        <h3 class="card-title">From Errors</h3>
+    </div>
+    <div class="card-body">
+        {% for error in form.non_field_errors %}
+        {{error}}
+        {% endfor %}
+
+    </div>
+</div>
+{% endif %}
+
+
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <div class="card-body">
+        <!-- EMAIL AND USERNAME SECTION -->
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-12 col-md-6 mb-3">
+                    <label for="id_email">Email address</label>
+                    {{form.email}}
+                    {% if form.email.errors %}
+                    <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                        {% for error in form.email.errors %}
+                        <p>{{error}}</p>
+                        {% endfor %}
+                    </blockquote>
+                    {% endif %}
+                </div>
+                <div class="col-sm-12 col-md-6 mb-3">
+                    <label for="id_username">Username</label>
+                    {{form.username}}
+                </div>
+            </div>
+        </div>
+
+        <!-- FIRST NAME AND LAST NAME SECTION -->
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-12 col-md-6 mb-3">
+                    <label for="id_first_name">First Name</label>
+                    {{form.first_name}}
+                    {% if form.first_name.errors %}
+                    <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                        {% for error in form.first_name.errors %}
+                        <p>{{error}}</p>
+                        {% endfor %}
+                    </blockquote>
+                    {% endif %}
+                </div>
+                <div class="col-sm-12 col-md-6 mb-3">
+                    <label for="id_last_name">Last Name</label>
+                    {{form.last_name}}
+                    {% if form.last_name.errors %}
+                    <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                        {% for error in form.last_name.errors %}
+                        <p>{{error}}</p>
+                        {% endfor %}
+                    </blockquote>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- WEBSITE AND PHONE NUMBER SECTION -->
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6 col-sm-12 mb-3">
+                    <label for="id_website">Website</label>
+                    {{form.website}}
+                    {% if form.website.errors %}
+                    <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                        {% for error in form.website.errors %}
+                        <p>{{error}}</p>
+                        {% endfor %}
+                    </blockquote>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 col-sm-12 mb-3">
+                    <label for="id_phone_number">Phone Number</label>
+                    {{form.phone_number}}
+                    {% if form.phone_number.errors %}
+                    <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                        {% for error in form.phone_number.errors %}
+                        <p>{{error}}</p>
+                        {% endfor %}
+                    </blockquote>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- BIO SECTION -->
+        <div class="form-group mb-3">
+            <label for="id_first_name">Biography</label>
+            {{form.bio}}
+            {% if form.bio.errors %}
+            <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                {% for error in form.bio.errors %}
+                <p>{{error}}</p>
+                {% endfor %}
+            </blockquote>
+            {% endif %}
+        </div>
+
+        <!-- IS BUSINESS AND GENDER AND IS PRIVATE AND DATE JOINED SECTION -->
+        <div class="form-group">
+            <div class="form-check">
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 mb-4">
+                        <label class="form-check-label" for="id_is_business">Business</label>
+                        {{form.is_business}}
+                    </div>
+                    <div class="col-sm-6 col-md-2 mb-4">
+                        <label class="form-check-label" for="id_is_private">Private</label>
+                        {{form.is_private}}
+                    </div>
+                    <div class="col-sm-6 col-md-4 mb-4">
+                        <div class="row">
+                            <div class="col-sm-3 col-xsm-6 mt-1">
+                                <label class="mx-auto">Gender</label>
+                            </div>
+                            <div class="col-sm-6 col-xsm-6">
+                                <select id="id_gender" name="gender" class="custom-select">
+                                    {% for value,full in form.fields.gender.choices %}
+                                    {% if value == form.fields.gender.initial %}
+                                    <option value="{{value}}" selected="">{{full}}</option>
+                                    {% else %}
+                                    <option value="{{value}}">{{full}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4 mb-4">
+                        <div class="row">
+                            <div class="col-sm-3 col-xsm-6">
+                                <label>Date Joined</label>
+                            </div>
+                            <div class="input-group date col-sm-8 col-xsm-12" id="reservationdate"
+                                data-target-input="nearest">
+                                {{form.date_joined}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BACKGROUND AND PROFILE PHOTO -->
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-sm-2 mt-1 col-xsm-6">
+                            <label for="exampleInputFile">Profile</label>
+                        </div>
+                        <div class="col-sm-10 col-xsm-12 mb-3">
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    {{form.profile_photo}}
+                                    <label class="custom-file-label" for="exampleInputFile">Choose photo</label>
+                                </div>
+                            </div>
+                            {% if form.profile_photo.errors %}
+                            <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                                {% for error in form.profile_photo.errors %}
+                                <p>{{error}}</p>
+                                {% endfor %}
+                            </blockquote>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-sm-3 col-md-4 mt-1 col-xsm-6">
+                            <label for="exampleInputFile">Background</label>
+                        </div>
+                        <div class="col-sm-9 col-md-8 mb-3">
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    {{form.background_photo}}
+                                    <label class="custom-file-label" for="exampleInputFile">Choose photo</label>
+                                </div>
+                            </div>
+                            {% if form.background_photo.errors %}
+                            <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                                {% for error in form.background_photo.errors %}
+                                <p>{{error}}</p>
+                                {% endfor %}
+                            </blockquote>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASSWORD SECTION -->
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-2 col-sm-3 col-md-2 col-xsm-6 mt-2">
+                    <label for="id_password">Your Password</label>
+                </div>
+                <div class="col-lg-4 col-sm-6 col-md-4 col-xsm-12">
+                    {{form.password}}
+                    {% if form.password.errors %}
+                    <blockquote class="quote-danger ml-0 mt-1 bg-light mr-0">
+                        {% for error in form.password.errors %}
+                        <p>{{error}}</p>
+                        {% endfor %}
+                    </blockquote>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card-footer bg-light">
+        <button type="submit" class="btn btn-primary col-2">Save</button>
+    </div>
+</form>
+{% endblock content %}

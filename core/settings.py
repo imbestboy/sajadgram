@@ -26,7 +26,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "account.apps.AccountConfig",
 ]
 
 MIDDLEWARE = [
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "middlewares.login.LoginRequiredMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -122,7 +124,33 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+]
+
+STATIC_ROOT = BASE_DIR.parent / "static"
+
+LOGIN_URL = "account:login"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+MEDIA_URL = "/user-media/"
+
+MEDIA_ROOT = BASE_DIR.parent / "media"
+
+LOGOUT_REDIRECT_URL = LOGIN_URL
+
+LOGIN_REDIRECT_URL = "account:timeline"
+
+LOGIN_EXEMPT_URLS = ("account:login", "account:signup")
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "account.User"

@@ -1,0 +1,81 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block title %} {{request.user.username}}'s profile {% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'account/css/profile.css' %}" type="text/css">
+{% endblock head %}
+
+{% block content-header %}
+{% if not is_owner %}{{account.username}}'s {% endif %}Profile
+{% endblock content-header %}
+
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="card card-widget widget-user shadow-lg col-sm-3 col-md-6 col-lg-6 col-xl-5 p-0">
+        <div class="widget-user-header text-white"
+            style="background: url('{{account.background_photo.url}}') center center; width: 100%; background-size: cover;">
+        </div>
+        <div class="widget-user-image profile-photo">
+            <img class="img-circle img-fluid profile-photo-img" src="{{account.profile_photo.url}}" alt="User Avatar">
+        </div>
+        <div class="px-3" style="margin-top:5rem;">
+            <h4 class="widget-user-username">{{account.username}}</h4>
+            {% if account.get_full_name %}
+            <h4 class="widget-user-desc pt-3">
+                {{account.get_full_name}}
+            </h4>
+            {% else %}
+            <h4 class="text-muted pt-3">full name</h4>
+            {% endif %}
+
+            {% if account.website%}
+            <h6 class="widget-user-desc pt-2">
+                <a href="{{account.website}}" target="_blank">{{account.website}}</a>
+            </h6>
+            {% else %}
+            <h6 class="pt-2"><a class="link-muted" target="_blank" href="https://google.com">https://google.com</a></h6>
+            {% endif %}
+
+            {% if account.bio %}
+            <h6 class="widget-user-desc pt-2">
+                {{account.bio}}
+            </h6>
+            {% else %}
+            <h6 class="text-muted pt-2">Bio</h6>
+            {% endif %}
+
+
+        </div>
+        <div class="card-footer bg-white">
+            <div class="row">
+                <div class="col-sm-4 border-right">
+                    <a class="counter-links" href="#">
+                        <div class="description-block">
+                            <h5 class="description-header">0</h5>
+                            <span class="description-text">Posts</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4 border-right">
+                    <a class="counter-links" href="#">
+                        <div class="description-block">
+                            <h5 class="description-header">0</h5>
+                            <span class="description-text">FOLLOWERS</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-sm-4">
+                    <a class="counter-links" href="#">
+                        <div class="description-block">
+                            <h5 class="description-header">0</h5>
+                            <span class="description-text">Followings</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
