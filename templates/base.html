@@ -117,6 +117,36 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-portrait"></i>
+                                <p>
+                                    Post
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <!-- TODO: change list links -->
+                                <li class="nav-item">
+                                    <a href="{% url 'post:create' %}" class="nav-link">
+                                        <i class="far fa-plus-square nav-icon"></i>
+                                        <p>new post</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'post:saved-list' %}" class="nav-link">
+                                        <i class="far fa-bookmark nav-icon"></i>
+                                        <p>saved</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'post:liked-list' %}" class="nav-link">
+                                        <i class="far fa-heart nav-icon"></i>
+                                        <p>liked</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
 
 
                         <!-- LOGOUT SECTION -->

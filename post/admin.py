@@ -5,4 +5,4 @@ from . import models
 
 @admin.register(models.Post)
 class UserAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("user", "display_name")
