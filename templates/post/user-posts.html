@@ -1,0 +1,22 @@
+{% extends '../base.html' %}
+{% load show_posts %}
+
+{% block title %}{% if current_username == request.user.username %}Your{% else %} {{current_username}}'s
+{% endif %} Posts {% endblock title %}
+
+{% block content-header %}
+{% if current_username == request.user.username %}Your{% else %} {{current_username}}'s
+{% endif %} Posts
+{% endblock content-header %}
+
+
+{% block content %}
+{% if posts|length == 0 %}
+<div class="alert alert-info alert-dismissible">
+    <h5><i class="icon fas fa-info"></i> Oops posts not found !</h5>
+    {{current_username}} have not post
+</div>
+{% else %}
+{% show_posts posts %}
+{% endif %}
+{% endblock content %}

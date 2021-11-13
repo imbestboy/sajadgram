@@ -1,5 +1,5 @@
 {% extends '../base.html' %}
-
+{% load show_posts %}
 
 {% block title %}
 Liked Posts | SajadGram
@@ -9,3 +9,15 @@ Liked Posts | SajadGram
 {% block content-header %}
 Liked Posts
 {% endblock content-header %}
+
+
+{% block content %}
+{% if posts|length == 0 %}
+<div class="alert alert-info alert-dismissible">
+    <h5><i class="icon fas fa-info"></i> Oops liked posts not found !</h5>
+    you doesn't like post yet
+</div>
+{% else %}
+{% show_posts posts %}
+{% endif %}
+{% endblock content %}

@@ -21,11 +21,19 @@ class SavedPostListView(generic.ListView):
     context_object_name = "posts"
     model = models.Post
 
+    # TODO: implement save post model and modify get_queryset
+    def get_queryset(self):
+        pass
+
 
 class LikedPostListView(generic.ListView):
     template_name = "post/liked-list.html"
     context_object_name = "posts"
     model = models.Post
+
+    # TODO: implement like post model and modify get_queryset
+    def get_queryset(self):
+        pass
 
 
 class ShowPostView(generic.DetailView):
@@ -35,3 +43,17 @@ class ShowPostView(generic.DetailView):
 
     def get_object(self, *args, **kwargs):
         return models.Post.objects.get(display_name=self.kwargs.get("display_name"))
+
+
+class UserPostList(generic.ListView):
+    template_name = "post/user-posts.html"
+    context_object_name = "posts"
+    model = models.Post
+
+    def get_queryset(self):
+        return models.Post.objects.filter(user__username=self.kwargs.get("username"))
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["current_username"] = self.kwargs.get("username")
+        return context

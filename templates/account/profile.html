@@ -1,13 +1,15 @@
 {% extends '../base.html' %}
 {% load static %}
-{% block title %} {{request.user.username}}'s profile {% endblock title %}
+{% block title %}{% if account.username == request.user.username %}Your{% else %} {{account.username}}'s
+{% endif %} Profile {% endblock title %}
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'account/css/profile.css' %}" type="text/css">
 {% endblock head %}
 
 {% block content-header %}
-{% if not is_owner %}{{account.username}}'s {% endif %}Profile
+{% if account.username == request.user.username %}Your{% else %} {{account.username}}'s
+{% endif %} Profile
 {% endblock content-header %}
 
 
@@ -51,7 +53,7 @@
         <div class="card-footer bg-white">
             <div class="row">
                 <div class="col-sm-4 border-right">
-                    <a class="counter-links" href="#">
+                    <a class="counter-links" href="{% url 'post:user-post-list' username=account.username %}">
                         <div class="description-block">
                             <h5 class="description-header">0</h5>
                             <span class="description-text">Posts</span>

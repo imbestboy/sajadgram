@@ -1,4 +1,6 @@
 {% extends '../base.html' %}
+{% load static %}
+{% load show_posts %}
 
 {% block title %}
 Saved Posts | SajadGram
@@ -7,3 +9,14 @@ Saved Posts | SajadGram
 {% block content-header %}
 Saved Posts
 {% endblock content-header %}
+
+{% block content %}
+{% if posts|length == 0 %}
+<div class="alert alert-info alert-dismissible">
+    <h5><i class="icon fas fa-info"></i> Oops saved posts not found !</h5>
+    you doesn't save post yet
+</div>
+{% else %}
+{% show_posts posts %}
+{% endif %}
+{% endblock content %}
