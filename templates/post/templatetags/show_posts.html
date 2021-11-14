@@ -1,11 +1,17 @@
-<div class="row justify-content-between">
+<div class="row justify-content-start">
     {% for post in posts %}
+    {% if is_go_deeper %}
     <div class="card mb-2 col-xsm-6 col-sm-2">
-        <a href="{% url 'post:show' display_name=post.display_name %}" class="custom-img">
-            <img class="card-img-top" src="{{post.media.url}}">
-            <div class="card-img-overlay d-flex flex-column justify-content-end">
-            </div>
+        <a href="{% url 'post:show' display_name=post.post.display_name %}">
+            <img class="card-img-top" src="{{post.post.media.url}}">
         </a>
     </div>
+    {% else %}
+    <div class="card mb-2 col-xsm-6 col-sm-2">
+        <a href="{% url 'post:show' display_name=post.display_name %}">
+            <img class="card-img-top" src="{{post.media.url}}">
+        </a>
+    </div>
+    {% endif %}
     {% endfor %}
 </div>

@@ -8,6 +8,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.shortcuts import get_object_or_404
 
+from post.models import Post
+
 
 class SignupView(generic.CreateView):
     template_name = "account/signup.html"
@@ -41,7 +43,11 @@ class ProfileView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["is_owner"] = self.kwargs.get("username") == self.request.user.username
+        current_username = self.kwargs.get("username")
+        context["post_count"] = Post.objects.filter(
+            user__username=current_username
+        ).count()
+        context["is_owner"] = current_username == self.request.user.username
         return context
 
 

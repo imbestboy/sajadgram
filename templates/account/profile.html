@@ -55,7 +55,7 @@
                 <div class="col-sm-4 border-right">
                     <a class="counter-links" href="{% url 'post:user-post-list' username=account.username %}">
                         <div class="description-block">
-                            <h5 class="description-header">0</h5>
+                            <h5 class="description-header">{{post_count}}</h5>
                             <span class="description-text">Posts</span>
                         </div>
                     </a>

@@ -27,6 +27,23 @@ class Post(models.Model):
         default=post_display_name_maker,
     )
     updated_time = models.DateTimeField(_("when post updated"), auto_now=True)
+    is_active = models.BooleanField(_("is showable"), default=True)
 
     def __str__(self):
         return self.display_name
+
+
+class SavedPost(models.Model):
+    user = models.ForeignKey(
+        "account.User", verbose_name=_("which user saved"), on_delete=models.CASCADE
+    )
+    post = models.ForeignKey(
+        Post, verbose_name=_("saved post"), on_delete=models.CASCADE
+    )
+    is_active = models.BooleanField(_("is saved"), default=True)
+    created_time = models.DateTimeField(
+        _("save time"), auto_now=False, auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.post.display_name
