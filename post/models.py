@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 from utilities.display_name import post_display_name_maker
 from utilities.media import hash_media_name
@@ -13,7 +14,7 @@ def save_post_path(instance, file_name):
 
 class Post(models.Model):
     user = models.ForeignKey(
-        "account.User", verbose_name=_("user's post"), on_delete=models.CASCADE
+        get_user_model(), verbose_name=_("user's post"), on_delete=models.CASCADE
     )
     caption = models.TextField(_("post caption"), max_length=1024, blank=True)
     media = models.ImageField(_("post's media"), upload_to=save_post_path)
@@ -35,7 +36,7 @@ class Post(models.Model):
 
 class SavedPost(models.Model):
     user = models.ForeignKey(
-        "account.User", verbose_name=_("which user saved"), on_delete=models.CASCADE
+        get_user_model(), verbose_name=_("which user saved"), on_delete=models.CASCADE
     )
     post = models.ForeignKey(
         Post, verbose_name=_("saved post"), on_delete=models.CASCADE
@@ -47,3 +48,16 @@ class SavedPost(models.Model):
 
     def __str__(self):
         return self.post.display_name
+
+
+class LikedPost(models.Model):
+    user = models.ForeignKey(
+        get_user_model(), verbose_name=_("liked user"), on_delete=models.CASCADE
+    )
+    post = models.ForeignKey(
+        "post.Post", verbose_name=_("liked post"), on_delete=models.CASCADE
+    )
+    is_active = models.BooleanField(_("is liked"), default=True)
+    created_time = models.DateTimeField(
+        _("when user liked"), auto_now=False, auto_now_add=True
+    )

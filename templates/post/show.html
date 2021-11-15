@@ -33,12 +33,14 @@ Post
                 <i class="far fa-bookmark nav-icon"></i> Save
                 {% endif %}
             </button>
-            <button type="button" class="btn btn-default btn-sm"><i class="far fa-thumbs-up"></i> Like</button>
-            <!-- TODO: liked -->
-            <!-- <button type="button" class="btn btn-default btn-sm">
+            <button type="button" class="btn btn-default btn-sm" id="like">
+                {% if is_liked %}
                 <i class="fas fa-thumbs-up text-primary"></i> Liked
-            </button> -->
-            <span class="float-right text-muted">127 likes - 3 comments</span>
+                {% else %}
+                <i class="far fa-thumbs-up"></i> Like
+                {% endif %}
+            </button>
+            <span class="float-right text-muted"><span id="liked_count">{{liked_count}}</span> likes - 3 comments</span>
         </div>
         <!-- <div class="card-footer">
         <form enctype="multipart/form-data" method="post">
@@ -67,6 +69,24 @@ Post
                     $("#save").html('<i class="fas text-primary fa-bookmark nav-icon"></i> Saved')
                 } else {
                     $("#save").html('<i class="far fa-bookmark nav-icon"></i> Save')
+                }
+            }
+        });
+    });
+    $("#like").click(function () {
+        $.ajax({
+            url: "{% url 'post:like' %}",
+            type: 'post',
+            data: JSON.parse('{"display_name":"{{post.display_name}}"}'),
+            success: function (data) {
+                if (data === "True") {
+                    $("#like").html('<i class="fas fa-thumbs-up text-primary"></i> Liked')
+                    var liked_count = Number($("#liked_count").text())
+                    $("#liked_count").text(String(++liked_count))
+                } else {
+                    $("#like").html('<i class="far fa-thumbs-up"></i> Like')
+                    var liked_count = Number($("#liked_count").text())
+                    $("#liked_count").text(String(--liked_count))
                 }
             }
         });

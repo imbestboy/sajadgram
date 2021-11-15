@@ -1,0 +1,16 @@
+{% extends '../base.html' %}
+{% load show_posts %}
+
+{% block title %}
+SajadGram | Explore
+{% endblock title %}
+
+
+{% block content-header %}
+Explore
+{% endblock content-header %}
+
+
+{% block content %}
+{% show_posts posts %}
+{% endblock content %}

@@ -11,4 +11,6 @@ urlpatterns = [
     path("post/<str:display_name>", views.ShowPostView.as_view(), name="show"),
     path("posts/<str:username>/", views.UserPostList.as_view(), name="user-post-list"),
     path("save-post/", views.SaveUnsaveView.as_view(), name="save"),
+    path("like-post/", views.LikeUnlikeView.as_view(), name="like"),
+    path("explore/", views.ExploreView.as_view(), name="explore"),
 ]
