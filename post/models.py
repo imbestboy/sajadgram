@@ -19,7 +19,7 @@ class Post(models.Model):
     caption = models.TextField(_("post caption"), max_length=1024, blank=True)
     media = models.ImageField(_("post's media"), upload_to=save_post_path)
     created_time = models.DateTimeField(
-        _("when post created"), auto_now=False, auto_now_add=True
+        _("post created time"), auto_now=False, auto_now_add=True
     )
     display_name = models.CharField(
         _("post name for urls"),
@@ -27,7 +27,7 @@ class Post(models.Model):
         unique=True,
         default=post_display_name_maker,
     )
-    updated_time = models.DateTimeField(_("when post updated"), auto_now=True)
+    updated_time = models.DateTimeField(_("post updated time"), auto_now=True)
     is_active = models.BooleanField(_("is showable"), default=True)
 
     def __str__(self):
@@ -55,9 +55,12 @@ class LikedPost(models.Model):
         get_user_model(), verbose_name=_("liked user"), on_delete=models.CASCADE
     )
     post = models.ForeignKey(
-        "post.Post", verbose_name=_("liked post"), on_delete=models.CASCADE
+        Post, verbose_name=_("liked post"), on_delete=models.CASCADE
     )
     is_active = models.BooleanField(_("is liked"), default=True)
     created_time = models.DateTimeField(
         _("when user liked"), auto_now=False, auto_now_add=True
     )
+
+    def __str__(self):
+        return f"{self.user.username} Liked {self.post.display_name} , {self.is_active}"

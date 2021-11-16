@@ -19,3 +19,16 @@ class SavePostAdmin(admin.ModelAdmin):
     @admin.display()
     def display_name(self, obj):
         return obj.post.display_name
+
+
+@admin.register(models.LikedPost)
+class SavePostAdmin(admin.ModelAdmin):
+    list_display = ("username", "display_name", "created_time", "is_active")
+
+    @admin.display()
+    def username(self, obj):
+        return obj.user.username
+
+    @admin.display()
+    def display_name(self, obj):
+        return obj.post.display_name

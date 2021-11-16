@@ -48,6 +48,16 @@
             <h6 class="text-muted pt-2">Bio</h6>
             {% endif %}
 
+            {% if account.username != request.user.username %}
+
+            {% if is_followed %}
+            <button type="button" class="btn btn-block btn-outline-primary mt-4" id="follow">Unfollow</button>
+            {% else %}
+            <button type="button" class="btn btn-block bg-gradient-primary mt-4" id="follow">Follow</button>
+            {% endif %}
+
+
+            {% endif %}
 
         </div>
         <div class="card-footer bg-white">
@@ -63,15 +73,15 @@
                 <div class="col-sm-4 border-right">
                     <a class="counter-links" href="#">
                         <div class="description-block">
-                            <h5 class="description-header">0</h5>
-                            <span class="description-text">FOLLOWERS</span>
+                            <h5 class="description-header" id="follower_count">{{follower_count}}</h5>
+                            <span class="description-text">Followers</span>
                         </div>
                     </a>
                 </div>
                 <div class="col-sm-4">
                     <a class="counter-links" href="#">
                         <div class="description-block">
-                            <h5 class="description-header">0</h5>
+                            <h5 class="description-header">{{following_count}}</h5>
                             <span class="description-text">Followings</span>
                         </div>
                     </a>
@@ -81,3 +91,29 @@
     </div>
 </div>
 {% endblock content %}
+
+
+{% block end-body %}
+<script>
+    $("#follow").click(function () {
+        $.ajax({
+            url: "{% url 'account:follow' %}",
+            type: 'post',
+            data: JSON.parse('{"username":"{{account.username}}"}'),
+            success: function (data) {
+                if (data === "True") {
+                    $("#follow").removeClass("bg-gradient-primary").addClass("btn-outline-primary")
+                        .text('Unfollow')
+                    var follower_count = Number($("#follower_count").text())
+                    $("#follower_count").text(String(++follower_count))
+                } else {
+                    $("#follow").removeClass("btn-outline-primary").addClass("bg-gradient-primary")
+                        .text('Follow')
+                    var follower_count = Number($("#follower_count").text())
+                    $("#follower_count").text(String(--follower_count))
+                }
+            }
+        });
+    });
+</script>
+{% endblock end-body %}

@@ -1,52 +1,9 @@
 from django.views import generic
 from django.urls import reverse_lazy
-from django.http import HttpResponse, Http404
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ImproperlyConfigured
 
+from utilities.views import DoUndoWithAjaxView
 from . import forms
 from . import models
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class DoUndoWithAjaxView(generic.View):
-    model = None
-
-    def post(self, request):
-        if request.is_ajax():
-            display_name = request.POST.get("display_name")
-            model = self.get_model()
-            try:
-                do_post = model.objects.get(
-                    post__display_name=display_name, user=request.user
-                )
-                do_post.is_active, is_do = (
-                    (False, False) if do_post.is_active else (True, True)
-                )
-                do_post.save()
-            except model.DoesNotExist:
-                model.objects.create(
-                    user=request.user,
-                    post=models.Post.objects.get(display_name=display_name),
-                )
-                is_do = True
-
-            return HttpResponse(str(is_do))
-        else:
-            raise Http404
-
-    def get_model(self, model=None):
-        if model:
-            self.model = model
-            return model
-        elif self.model is None:
-            raise ImproperlyConfigured(
-                "%(cls)s is missing a model. Define "
-                "%(cls)s.model, or override "
-                "%(cls)s.get_model()." % {"cls": self.__class__.__name__}
-            )
-        return self.model
 
 
 class CreatePostView(generic.CreateView):
@@ -127,6 +84,20 @@ class SaveUnsaveView(DoUndoWithAjaxView):
 
 class LikeUnlikeView(DoUndoWithAjaxView):
     model = models.LikedPost
+
+    def get_check_dict(self):
+        return {
+            "post__display_name": self.request.POST.get("display_name"),
+            "user": self.request.user,
+        }
+
+    def get_create_dict(self):
+        return {
+            "user": self.request.user,
+            "post": models.Post.objects.get(
+                display_name=self.request.POST.get("display_name")
+            ),
+        }
 
 
 class ExploreView(generic.ListView):

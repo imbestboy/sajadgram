@@ -11,5 +11,6 @@ urlpatterns = [
     path("logout/", view=LogoutView.as_view(), name="logout"),
     path("", view=views.TimeLineView.as_view(), name="timeline"),
     path("edit-profile/", views.EditProfileView.as_view(), name="edit-profile"),
+    path("follow/", views.FollowUnfollowView.as_view(), name="follow"),
     path("<str:username>/", views.ProfileView.as_view(), name="profile"),
 ]

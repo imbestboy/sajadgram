@@ -5,3 +5,8 @@ from . import models
 @admin.register(models.User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ("username", "email", "phone_number", "gender")
+
+
+@admin.register(models.Follow)
+class FollowAdmin(admin.ModelAdmin):
+    pass

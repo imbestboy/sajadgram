@@ -1,5 +1,3 @@
-from . import forms
-
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.views import generic
@@ -7,8 +5,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
 
+from . import forms
+from . import models
 from post.models import Post
+from utilities.views import DoUndoWithAjaxView
 
 
 class SignupView(generic.CreateView):
@@ -47,7 +49,18 @@ class ProfileView(generic.DetailView):
         context["post_count"] = Post.objects.filter(
             user__username=current_username
         ).count()
-        context["is_owner"] = current_username == self.request.user.username
+        context["following_count"] = models.Follow.objects.filter(
+            from_user__username=current_username, is_active=True
+        ).count()
+        context["follower_count"] = models.Follow.objects.filter(
+            to_user__username=current_username, is_active=True
+        ).count()
+        if current_username != self.request.user.username:
+            context["is_followed"] = models.Follow.objects.filter(
+                to_user__username=current_username,
+                from_user=self.request.user,
+                is_active=True,
+            ).exists()
         return context
 
 
@@ -77,3 +90,21 @@ class EditProfileView(generic.UpdateView):
         if form_class is None:
             form_class = self.get_form_class()
         return form_class(**self.get_form_kwargs(), user=user)
+
+
+class FollowUnfollowView(DoUndoWithAjaxView):
+    model = models.Follow
+
+    def get_check_dict(self):
+        current_username = self.request.POST.get("username")
+        if self.request.user.username == current_username:
+            raise PermissionDenied("You cant follow your self !")
+        return {"from_user": self.request.user, "to_user__username": current_username}
+
+    def get_create_dict(self):
+        return {
+            "from_user": self.request.user,
+            "to_user": get_user_model().objects.get(
+                username=self.request.POST.get("username")
+            ),
+        }
