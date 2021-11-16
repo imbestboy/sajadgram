@@ -1,7 +1,7 @@
 {% extends '../base.html' %}
 {% load show_posts %}
 
-{% block title %}{% if current_username == request.user.username %}Your{% else %} {{current_username}}'s
+{% block title %}SajadGram | {% if current_username == request.user.username %}Your{% else %} {{current_username}}'s
 {% endif %} Posts {% endblock title %}
 
 {% block content-header %}

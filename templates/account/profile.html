@@ -1,6 +1,6 @@
 {% extends '../base.html' %}
 {% load static %}
-{% block title %}{% if account.username == request.user.username %}Your{% else %} {{account.username}}'s
+{% block title %}SajadGram | {% if account.username == request.user.username %}Your{% else %} {{account.username}}'s
 {% endif %} Profile {% endblock title %}
 
 {% block head %}
