@@ -12,5 +12,6 @@ urlpatterns = [
     path("", view=views.TimeLineView.as_view(), name="timeline"),
     path("edit-profile/", views.EditProfileView.as_view(), name="edit-profile"),
     path("follow/", views.FollowUnfollowView.as_view(), name="follow"),
+    path("block/", views.BlockUnblockView.as_view(), name="block"),
     path("<str:username>/", views.ProfileView.as_view(), name="profile"),
 ]

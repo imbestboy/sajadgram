@@ -1,6 +1,7 @@
 from django.views import generic
 from django.urls import reverse_lazy
 
+from account.models import Block
 from utilities.views import DoUndoWithAjaxView
 from . import forms
 from . import models
@@ -106,4 +107,10 @@ class ExploreView(generic.ListView):
     model = models.Post
 
     def get_queryset(self):
-        return self.model.objects.all().order_by("?")
+        blocked_users = (
+            blocked_user.to_user
+            for blocked_user in Block.objects.filter(
+                from_user=self.request.user, is_active=True
+            )
+        )
+        return self.model.objects.all().exclude(user__in=blocked_users).order_by("?")

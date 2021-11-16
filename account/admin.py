@@ -10,3 +10,8 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(models.Follow)
 class FollowAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(models.Block)
+class BlockAdmin(admin.ModelAdmin):
+    pass

@@ -55,6 +55,11 @@ class ProfileView(generic.DetailView):
         context["follower_count"] = models.Follow.objects.filter(
             to_user__username=current_username, is_active=True
         ).count()
+        context["is_block"] = models.Block.objects.filter(
+            from_user=self.request.user,
+            to_user__username=current_username,
+            is_active=True,
+        ).exists()
         if current_username != self.request.user.username:
             context["is_followed"] = models.Follow.objects.filter(
                 to_user__username=current_username,
@@ -94,11 +99,12 @@ class EditProfileView(generic.UpdateView):
 
 class FollowUnfollowView(DoUndoWithAjaxView):
     model = models.Follow
+    permission_denied_message = "You cant follow your self !"
 
     def get_check_dict(self):
         current_username = self.request.POST.get("username")
         if self.request.user.username == current_username:
-            raise PermissionDenied("You cant follow your self !")
+            raise PermissionDenied(self.permission_denied_message)
         return {"from_user": self.request.user, "to_user__username": current_username}
 
     def get_create_dict(self):
@@ -108,3 +114,26 @@ class FollowUnfollowView(DoUndoWithAjaxView):
                 username=self.request.POST.get("username")
             ),
         }
+
+
+class BlockUnblockView(FollowUnfollowView):
+    model = models.Block
+    permission_denied_message = "You cant block your self !"
+
+    def post(self, *args, **kwargs):
+        super_post = super().post(*args, **kwargs)
+        self.unfollow_when_block(super_post.content.decode("utf-8"))
+        return super_post
+
+    def unfollow_when_block(self, is_blocked):
+        if is_blocked == "True":
+            try:
+                followed = models.Follow.objects.get(
+                    from_user=self.request.user,
+                    to_user__username=self.request.POST.get("username"),
+                    is_active=True,
+                )
+                followed.is_active = False
+                followed.save()
+            except models.Follow.DoesNotExist:
+                pass

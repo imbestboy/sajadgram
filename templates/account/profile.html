@@ -16,15 +16,29 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="card card-widget widget-user shadow-lg col-sm-3 col-md-6 col-lg-6 col-xl-5 p-0">
+
+        {% if is_block %}
+        <div class="widget-user-header text-white"
+            style="background: url(&quot; {% static 'images/background_block.jpeg' %} &quot;) center center; width: 100%; background-size: cover;">
+        </div>
+        {% else %}
         <div class="widget-user-header text-white"
             style="background: url('{{account.background_photo.url}}') center center; width: 100%; background-size: cover;">
         </div>
+        {% endif %}
+
         <div class="widget-user-image profile-photo">
+
+            {% if is_block %}
+            <img class="img-circle img-fluid profile-photo-img" src="{% static 'images/block.jpeg' %}"
+                alt="Blocked Avatar">
+            {% else %}
             <img class="img-circle img-fluid profile-photo-img" src="{{account.profile_photo.url}}" alt="User Avatar">
+            {% endif %}
         </div>
         <div class="px-3" style="margin-top:5rem;">
             <h4 class="widget-user-username">{{account.username}}</h4>
-            {% if account.get_full_name %}
+            {% if account.get_full_name and not is_block %}
             <h4 class="widget-user-desc pt-3">
                 {{account.get_full_name}}
             </h4>
@@ -32,7 +46,7 @@
             <h4 class="text-muted pt-3">full name</h4>
             {% endif %}
 
-            {% if account.website%}
+            {% if account.website and not is_block %}
             <h6 class="widget-user-desc pt-2">
                 <a href="{{account.website}}" target="_blank">{{account.website}}</a>
             </h6>
@@ -40,7 +54,7 @@
             <h6 class="pt-2"><a class="link-muted" target="_blank" href="https://google.com">https://google.com</a></h6>
             {% endif %}
 
-            {% if account.bio %}
+            {% if account.bio and not is_block %}
             <h6 class="widget-user-desc pt-2">
                 {{account.bio}}
             </h6>
@@ -48,14 +62,17 @@
             <h6 class="text-muted pt-2">Bio</h6>
             {% endif %}
 
-            {% if account.username != request.user.username %}
-
-            {% if is_followed %}
-            <button type="button" class="btn btn-block btn-outline-primary mt-4" id="follow">Unfollow</button>
-            {% else %}
-            <button type="button" class="btn btn-block bg-gradient-primary mt-4" id="follow">Follow</button>
-            {% endif %}
-
+            {% if account.username != request.user.username and not is_block %}
+            <div class="row justify-content-between">
+                {% if is_followed %}
+                <button type="button" class="btn btn-outline-primary mt-4 col-3" id="follow">Unfollow</button>
+                {% else %}
+                <button type="button" class="btn bg-gradient-primary mt-4 col-3" id="follow">Follow</button>
+                {% endif %}
+                <button type="button" class="btn bg-gradient-primary mt-4 col-3" id="block">Block</button>
+            </div>
+            {% elif is_block %}
+            <button type="button" class="btn btn-block btn-outline-primary mt-4" id="block">Unblock</button>
 
             {% endif %}
 
@@ -65,7 +82,13 @@
                 <div class="col-sm-4 border-right">
                     <a class="counter-links" href="{% url 'post:user-post-list' username=account.username %}">
                         <div class="description-block">
-                            <h5 class="description-header">{{post_count}}</h5>
+                            <h5 class="description-header">
+                                {% if is_block %}
+                                0
+                                {% else %}
+                                {{post_count}}
+                                {% endif %}
+                            </h5>
                             <span class="description-text">Posts</span>
                         </div>
                     </a>
@@ -73,7 +96,13 @@
                 <div class="col-sm-4 border-right">
                     <a class="counter-links" href="#">
                         <div class="description-block">
-                            <h5 class="description-header" id="follower_count">{{follower_count}}</h5>
+                            <h5 class="description-header" id="follower_count">
+                                {% if is_block %}
+                                0
+                                {% else %}
+                                {{follower_count}}
+                                {% endif %}
+                            </h5>
                             <span class="description-text">Followers</span>
                         </div>
                     </a>
@@ -81,7 +110,13 @@
                 <div class="col-sm-4">
                     <a class="counter-links" href="#">
                         <div class="description-block">
-                            <h5 class="description-header">{{following_count}}</h5>
+                            <h5 class="description-header">
+                                {% if is_block %}
+                                0
+                                {% else %}
+                                {{following_count}}
+                                {% endif %}
+                            </h5>
                             <span class="description-text">Followings</span>
                         </div>
                     </a>
@@ -103,15 +138,25 @@
             success: function (data) {
                 if (data === "True") {
                     $("#follow").removeClass("bg-gradient-primary").addClass("btn-outline-primary")
-                        .text('Unfollow')
-                    var follower_count = Number($("#follower_count").text())
-                    $("#follower_count").text(String(++follower_count))
+                        .text('Unfollow');
+                    var follower_count = Number($("#follower_count").text());
+                    $("#follower_count").text(String(++follower_count));
                 } else {
                     $("#follow").removeClass("btn-outline-primary").addClass("bg-gradient-primary")
-                        .text('Follow')
-                    var follower_count = Number($("#follower_count").text())
-                    $("#follower_count").text(String(--follower_count))
+                        .text('Follow');
+                    var follower_count = Number($("#follower_count").text());
+                    $("#follower_count").text(String(--follower_count));
                 }
+            }
+        });
+    });
+    $("#block").click(function () {
+        $.ajax({
+            url: "{% url 'account:block' %}",
+            type: 'post',
+            data: JSON.parse('{"username":"{{account.username}}"}'),
+            success: function (data) {
+                location.reload();
             }
         });
     });

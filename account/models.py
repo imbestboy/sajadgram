@@ -111,3 +111,25 @@ class Follow(models.Model):
 
     def __str__(self):
         return f"{self.to_user.username} Followed by {self.from_user.username} , {self.is_active}"
+
+
+class Block(models.Model):
+    to_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="to user",
+        related_name="to_user_block",
+    )
+    from_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="from user",
+        related_name="from_user_block",
+    )
+    is_active = models.BooleanField(_("is blocked"), default=True)
+    created_time = models.DateTimeField(
+        _("block time"), auto_now=False, auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.to_user.username} Blocked by {self.from_user.username} , {self.is_active}"
