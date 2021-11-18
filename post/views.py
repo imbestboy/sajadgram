@@ -19,7 +19,7 @@ class CreatePostView(generic.CreateView):
 
 
 class SavedPostListView(generic.ListView):
-    paginate = 30
+    paginate_by = 30
     template_name = "post/saved-list.html"
     context_object_name = "posts"
     model = models.Post
@@ -29,7 +29,7 @@ class SavedPostListView(generic.ListView):
 
 
 class LikedPostListView(generic.ListView):
-    paginate = 30
+    paginate_by = 30
     template_name = "post/liked-list.html"
     context_object_name = "posts"
     model = models.Post

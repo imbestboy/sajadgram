@@ -1,0 +1,58 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load show_users %}
+
+{% block title %}
+SajadGram | Search
+{% endblock title %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'account/css/search.css' %}">
+
+{% endblock head %}
+
+{% block content-header %}
+Search
+{% endblock content-header %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <form action="{% url 'account:search'%}">
+            <div class="input-group">
+                <input name="q" type="search" class="form-control form-control-lg" placeholder="Search here ...">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-lg btn-default">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col-md-10 offset-md-1">
+        <div class="list-group">
+
+            {% if accounts|length == 0 %}
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col px-4">
+                        <div>
+                            <h3>User Not Found !</h3>
+                            <p class="mb-0">Please enter correct username or full name</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            {% show_users accounts %}
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

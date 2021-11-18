@@ -94,7 +94,7 @@
                     </a>
                 </div>
                 <div class="col-sm-4 border-right">
-                    <a class="counter-links" href="#">
+                    <a class="counter-links" href="{% url 'account:followers' username=account.username %}">
                         <div class="description-block">
                             <h5 class="description-header" id="follower_count">
                                 {% if is_block %}
@@ -108,7 +108,7 @@
                     </a>
                 </div>
                 <div class="col-sm-4">
-                    <a class="counter-links" href="#">
+                    <a class="counter-links" href="{% url 'account:followings' username=account.username %}">
                         <div class="description-block">
                             <h5 class="description-header">
                                 {% if is_block %}

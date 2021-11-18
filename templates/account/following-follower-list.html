@@ -1,0 +1,39 @@
+{% extends '../base.html' %}
+{% load show_users %}
+
+
+{% block title %}
+SajadGram | {{follower_or_following}}
+{% endblock title %}
+
+
+{% block content-header %}
+{{follower_or_following}}
+{% endblock content-header %}
+
+
+{% block content %}
+
+{% if accounts|length == 0 %}
+
+{% if request.user.username == current_username %}
+<div class="alert alert-info alert-dismissible">
+    <h5><i class="icon fas fa-info"></i> Oops {{follower_or_following}} not found !</h5>
+    You doesn't have {{follower_or_following}}
+</div>
+{% else %}
+<div class="alert alert-info alert-dismissible">
+    <h5><i class="icon fas fa-info"></i> Oops {{follower_or_following}} not found !</h5>
+    {{current_username}} doesn't have {{follower_or_following}}
+</div>
+{% endif %}
+
+{% else %}
+{% if follower_or_following == "Followers" %}
+{% show_users accounts True True %}
+{% else %}
+{% show_users accounts True %}
+{% endif %}
+
+{% endif %}
+{% endblock content %}

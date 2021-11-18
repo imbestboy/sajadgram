@@ -13,5 +13,16 @@ urlpatterns = [
     path("edit-profile/", views.EditProfileView.as_view(), name="edit-profile"),
     path("follow/", views.FollowUnfollowView.as_view(), name="follow"),
     path("block/", views.BlockUnblockView.as_view(), name="block"),
+    path("search/", views.SearchView.as_view(), name="search"),
+    path(
+        "followings/<str:username>/",
+        views.FollowingsListView.as_view(),
+        name="followings",
+    ),
+    path(
+        "followers/<str:username>/",
+        views.FollowersListView.as_view(),
+        name="followers",
+    ),
     path("<str:username>/", views.ProfileView.as_view(), name="profile"),
 ]

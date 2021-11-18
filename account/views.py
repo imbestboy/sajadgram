@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 
 from . import forms
 from . import models
@@ -31,8 +32,19 @@ class LoginView(DjangoLoginView):
     redirect_authenticated_user = reverse_lazy(settings.LOGIN_REDIRECT_URL)
 
 
-class TimeLineView(generic.TemplateView):  # ListView
+class TimeLineView(generic.ListView):
     template_name = "account/timeline.html"
+    context_object_name = "posts"
+    model = Post
+
+    def queryset(self):
+        followed_users = (
+            followed_user.to_user
+            for followed_user in models.Follow.objects.filter(
+                from_user=self.request.user, is_active=True
+            )
+        )
+        return Post.objects.filter(user__in=followed_users).order_by("created_time")
 
 
 class ProfileView(generic.DetailView):
@@ -135,5 +147,77 @@ class BlockUnblockView(FollowUnfollowView):
                 )
                 followed.is_active = False
                 followed.save()
+                followed = models.Follow.objects.get(
+                    from_user__username=self.request.POST.get("username"),
+                    to_user=self.request.user,
+                    is_active=True,
+                )
+                followed.is_active = False
+                followed.save()
             except models.Follow.DoesNotExist:
                 pass
+
+
+class SearchView(generic.ListView):
+    paginate_by = 15
+    template_name = "account/search.html"
+    model = get_user_model()
+    context_object_name = "accounts"
+
+    def get_queryset(self):
+        search = self.request.GET.get("q", None)
+        blocked_users_username = (
+            blocked_user.to_user.username
+            for blocked_user in models.Block.objects.filter(
+                from_user=self.request.user, is_active=True
+            )
+        )
+        return (
+            (
+                get_user_model()
+                .objects.filter(
+                    Q(username__contains=search)
+                    | Q(first_name__contains=search)
+                    | Q(last_name__contains=search)
+                )
+                .exclude(username__in=blocked_users_username)
+            )
+            if search
+            else []
+        )
+
+
+class FollowersListView(generic.ListView):
+    template_name = "account/following-follower-list.html"
+    paginate_by = 15
+    context_object_name = "accounts"
+    model = models.Follow
+
+    def get_queryset(self):
+        return self.model.objects.filter(
+            to_user__username=self.kwargs.get("username"), is_active=True
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["follower_or_following"] = "Followers"
+        context["current_username"] = self.kwargs.get("username")
+        return context
+
+
+class FollowingsListView(generic.ListView):
+    template_name = "account/following-follower-list.html"
+    paginate_by = 15
+    context_object_name = "accounts"
+    model = models.Follow
+
+    def get_queryset(self):
+        return self.model.objects.filter(
+            from_user__username=self.kwargs.get("username"), is_active=True
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["follower_or_following"] = "Followings"
+        context["current_username"] = self.kwargs.get("username")
+        return context

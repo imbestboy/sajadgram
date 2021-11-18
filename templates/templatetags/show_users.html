@@ -1,0 +1,31 @@
+{% for account in accounts %}
+<a class="text-dark" href="{% url 'account:profile' username=account.username %}">
+    <div class="list-group-item">
+        <div class="row">
+            <div class="col-auto">
+                <img class="img-fluid img-circle" src="{{account.profile_photo.url}}" alt="User Avatar"
+                    style="max-height: 160px;">
+            </div>
+            <div class="col px-4">
+                <div>
+                    <h3>{{account.username}}</h3>
+                    <p class="mb-1">
+                        {% if account.get_full_name %}
+                        {{account.get_full_name}}
+                        {% else %}
+                        full name
+                        {% endif %}
+                    </p>
+                    <p class="mb-0">
+                        {% if account.bio %}
+                        {{account.bio}}
+                        {% else %}
+                        Bio
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>
+{% endfor %}
