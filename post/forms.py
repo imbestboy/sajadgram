@@ -1,4 +1,5 @@
 from django import forms
+from django.core.files.images import get_image_dimensions
 
 from . import models
 
@@ -31,3 +32,15 @@ class CreatePostForm(forms.ModelForm):
     class Meta:
         model = models.Post
         fields = ("caption", "media")
+
+    def clean_media(self):
+        media = self.cleaned_data.get("media")
+        width, height = get_image_dimensions(media)
+        if width / height != 1.0:
+            self.add_error("media", "Post photo should be square")
+        elif width < 300 or height < 300:
+            self.add_error(
+                "media",
+                "Post photo too small , width and height must be greater than 299",
+            )
+        return media
