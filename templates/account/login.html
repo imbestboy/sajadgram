@@ -1,105 +1,58 @@
+{% extends '../before-login-forms-base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SajadGram | Login</title>
+{% block title %}SajadGram | Login{% endblock title %}
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
-    <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
-</head>
+{% block content %}
+<p class="login-box-msg">Login to start your session</p>
+{% if form.non_field_errors %}
 
-<body class="hold-transition login-page">
-    <div class="login-box">
-        <div class="card card-outline card-primary">
-            <div class="card-header text-center">
-                <a href="#" class="h1"><b>Sajad</b>Gram</a>
-            </div>
-            <div class="card-body">
-                <p class="login-box-msg">Login to start your session</p>
-                {% if form.non_field_errors %}
+<div class="card bg-danger mb-3">
+    <div class="card-body">
+        {% for error in form.non_field_errors %}
+        {{error}}
+        {% endfor %}
+    </div>
+</div>
 
-                <div class="card bg-danger mb-3">
-                    <div class="card-body">
-                        {% for error in form.non_field_errors %}
-                        {{error}}
-                        {% endfor %}
-                    </div>
-                </div>
-
-                {% endif %}
-                <form method="post">{% csrf_token %}
-                    <div class="input-group mb-3">
-                        {{form.username}}
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-envelope"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="input-group mb-3">
-                        {{form.password}}
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-6">
-                            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-                        </div>
-                    </div>
-                </form>
-                <div class="social-auth-links text-center mb-3">
-                    <p>- OR -</p>
-                </div>
-
-                <div class="social-auth-links text-center mt-2 mb-3">
-                    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-block btn-danger">
-                        <i class="fab fa-google mr-2"></i> Login/Signup with Google
-                    </a>
-                </div>
-
-                <p class="mb-1">
-                    <a href="#">I forgot my password</a>
-                </p>
-                <p class="mb-0">
-                    <a href="{% url 'account:signup' %}" class="text-center">I don't have account</a>
-                </p>
+{% endif %}
+<form method="post">{% csrf_token %}
+    <div class="input-group mb-3">
+        {{form.username}}
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-google">
-        <div class="modal-dialog">
-            <div class="modal-content bg-danger">
-                <div class="modal-header">
-                    <h4 class="modal-title">coming soon...</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-outline-light" data-dismiss="modal">got it</button>
-                </div>
+    <div class="input-group mb-3">
+        {{form.password}}
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <span class="fas fa-lock"></span>
             </div>
         </div>
     </div>
-    <!-- jQuery -->
-    <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
-    <!-- Bootstrap 4 -->
-    <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <!-- AdminLTE App -->
-    <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
-</body>
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+        </div>
+    </div>
+</form>
+<div class="social-auth-links text-center mb-3">
+    <p>- OR -</p>
+</div>
 
-</html>
+<div class="social-auth-links text-center mt-2 mb-3">
+    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-block btn-danger">
+        <i class="fab fa-google mr-2"></i> Login/Signup with Google
+    </a>
+</div>
+
+<p class="mb-1">
+    <a href="{% url 'account:reset-password' %}">I forgot my password</a>
+</p>
+<p class="mb-0">
+    <a href="{% url 'account:signup' %}" class="text-center">I don't have account</a>
+</p>
+{% endblock content %}

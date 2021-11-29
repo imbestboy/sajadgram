@@ -27,5 +27,21 @@ urlpatterns = [
         views.FollowersListView.as_view(),
         name="followers",
     ),
+    path("reset-password/", views.PasswordResetView.as_view(), name="reset-password"),
+    path(
+        "reset-password-done/",
+        views.PasswordResetDoneView.as_view(),
+        name="reset-password-done",
+    ),
+    path(
+        "reset-password-confirm/<uidb64>/<token>/",
+        views.PasswordResetConfirmView.as_view(),
+        name="reset-password-confirm",
+    ),
+    path(
+        "reset-password-complete/",
+        views.PasswordResetCompleteView.as_view(),
+        name="reset-password-complete",
+    ),
     path("<str:username>/", views.ProfileView.as_view(), name="profile"),
 ]

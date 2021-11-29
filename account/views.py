@@ -3,7 +3,13 @@ from django.shortcuts import redirect
 from django.views import generic
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.contrib.auth.views import (
+    LoginView as DjangoLoginView,
+    PasswordResetView as DjangoPasswordResetView,
+    PasswordResetDoneView as DjangoPasswordResetDoneView,
+    PasswordResetConfirmView as DjangoPasswordResetConfirmView,
+    PasswordResetCompleteView as DjangoPasswordResetCompleteView,
+)
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -247,3 +253,26 @@ class FinalizeSignupView(generic.UpdateView):
         self.request.user.backend = "django.contrib.auth.backends.ModelBackend"
         login(self.request, self.request.user)
         return valid_form
+
+
+class PasswordResetView(DjangoPasswordResetView):
+    email_template_name = "account/resetpassword/reset-password-email.html"
+    html_email_template_name = None
+    subject_template_name = "account/resetpassword/reset-password-subject.txt"
+    success_url = reverse_lazy("account:reset-password-done")
+    template_name = "account/resetpassword/reset-password-view.html"
+    form_class = forms.ResetPasswordForm
+
+
+class PasswordResetDoneView(DjangoPasswordResetDoneView):
+    template_name = "account/resetpassword/reset-password-done.html"
+
+
+class PasswordResetConfirmView(DjangoPasswordResetConfirmView):
+    form_class = forms.SetPasswordForm
+    success_url = reverse_lazy("account:reset-password-complete")
+    template_name = "account/resetpassword/reset-password-confirm.html"
+
+
+class PasswordResetCompleteView(DjangoPasswordResetCompleteView):
+    template_name = "account/resetpassword/reset-password-complete.html"

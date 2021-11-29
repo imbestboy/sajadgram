@@ -132,29 +132,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+# Static Files
 STATIC_URL = "/static/"
-
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
-
 STATIC_ROOT = BASE_DIR.parent / "static"
-
-LOGIN_URL = "account:login"
-
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+# Media Settings
 MEDIA_URL = "/user-media/"
-
 MEDIA_ROOT = BASE_DIR.parent / "media"
 
+# Login Logout Settings
+LOGIN_URL = "account:login"
 LOGOUT_REDIRECT_URL = LOGIN_URL
-
 LOGIN_REDIRECT_URL = "account:timeline"
-
 LOGIN_EXEMPT_URLS = (
     "account:login",
     "account:signup",
@@ -162,6 +158,10 @@ LOGIN_EXEMPT_URLS = (
     "social:complete",
     "social:disconnect",
     "social:disconnect_individual",
+    "account:reset-password",
+    "account:reset-password-done",
+    "account:reset-password-confirm",
+    "account:reset-password-complete",
 )
 
 
@@ -172,8 +172,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "account.User"
 
+# Social Auth Settings
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL_AUTH_GOOGLE_OAUTH_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL_AUTH_GOOGLE_OAUTH_SECRET")
-
 SOCIAL_AUTH_URL_NAMESPACE = "social"
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = "account:finalize-signup"
+
+
+# Email Settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_PORT = config("EMAIL_PORT", cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)

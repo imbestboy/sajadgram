@@ -1,4 +1,9 @@
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    UserCreationForm,
+    PasswordResetForm,
+    SetPasswordForm as DjangoSetPasswordForm,
+)
 from django.contrib.auth import get_user_model
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -225,3 +230,22 @@ class EditProfileForm(forms.ModelForm):
             self.cleaned_data.pop(dont_update_field, None)
         instance.save(update_fields=self.cleaned_data.keys())
         return instance
+
+
+class ResetPasswordForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].widget = forms.TextInput(
+            attrs={"placeholder": "Email", "class": "form-control"}
+        )
+
+
+class SetPasswordForm(DjangoSetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["new_password1"].widget = forms.PasswordInput(
+            attrs={"placeholder": "New Password", "class": "form-control"}
+        )
+        self.fields["new_password2"].widget = forms.PasswordInput(
+            attrs={"placeholder": "Confirmation Password", "class": "form-control"}
+        )
