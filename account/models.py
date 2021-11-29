@@ -74,6 +74,7 @@ class User(AbstractUser):
         help_text="write your phone number like : +989127957054 or 09127957054",
     )
     is_business = models.BooleanField(_("business account"), default=False)
+    is_new_google_user = models.BooleanField(_("is new google user"), default=True)
     gender = models.CharField(
         _("gender"), max_length=1, choices=Gender.choices, default=Gender.UNSET
     )

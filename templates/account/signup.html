@@ -25,10 +25,9 @@
         <a href="#" class="h1"><b>Sajad</b>Gram</a>
       </div>
       <div class="card-body">
-        <p class="login-box-msg">signup for free</p>
+        <p class="login-box-msg">signup for free<br /><b>NOTE :</b> you cant edit username be careful</p>
+
         {% if form.non_field_errors %}
-
-
         <div class="card card-danger">
           <div class="card-body">
             {% for error in form.non_field_errors %}
@@ -107,11 +106,10 @@
         <div class="social-auth-links text-center mb-3">
           <p>- OR -</p>
         </div>
-        <div class="social-auth-links text-center">
-          <button href="#" class="btn btn-block btn-danger" data-toggle="modal" data-target="#modal-google">
-            <i class="fab fa-google mr-2"></i>
-            Sign up with Google
-          </button>
+        <div class="social-auth-links text-center mt-2 mb-3">
+          <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-block btn-danger">
+            <i class="fab fa-google mr-2"></i> Login/Signup with Google
+          </a>
         </div>
         <a href="{% url 'account:login' %}" class="text-center">I already have an account</a>
       </div>

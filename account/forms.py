@@ -163,6 +163,7 @@ class EditProfileForm(forms.ModelForm):
             "user_permissions",
             "is_staff",
             "is_active",
+            "is_new_google_user",
         )
 
     def clean(self):
@@ -181,7 +182,7 @@ class EditProfileForm(forms.ModelForm):
         return password
 
     def clean_email(self):
-        email = self.cleaned_data.get("email", None)
+        email = self.cleaned_data.get("email", None).lower()
         try:
             user = get_user_model().objects.get(email=email)
             if user == self.user:

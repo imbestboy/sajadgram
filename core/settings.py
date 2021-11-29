@@ -40,6 +40,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "account.apps.AccountConfig",
     "post.apps.PostConfig",
+    "social_django",
+]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "social_core.backends.google.GoogleOAuth2",
 ]
 
 MIDDLEWARE = [
@@ -51,6 +57,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "middlewares.login.LoginRequiredMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -66,6 +73,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
             ],
         },
     },
@@ -146,7 +155,14 @@ LOGOUT_REDIRECT_URL = LOGIN_URL
 
 LOGIN_REDIRECT_URL = "account:timeline"
 
-LOGIN_EXEMPT_URLS = ("account:login", "account:signup")
+LOGIN_EXEMPT_URLS = (
+    "account:login",
+    "account:signup",
+    "social:begin",
+    "social:complete",
+    "social:disconnect",
+    "social:disconnect_individual",
+)
 
 
 # Default primary key field type
@@ -155,3 +171,9 @@ LOGIN_EXEMPT_URLS = ("account:login", "account:signup")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "account.User"
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL_AUTH_GOOGLE_OAUTH_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL_AUTH_GOOGLE_OAUTH_SECRET")
+
+SOCIAL_AUTH_URL_NAMESPACE = "social"
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = "account:finalize-signup"

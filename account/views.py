@@ -7,6 +7,7 @@ from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.contrib.auth import login
 
 from . import forms
 from . import models
@@ -24,6 +25,10 @@ class SignupView(generic.CreateView):
         if request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL)
         return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.is_new_google_user = False
+        return super().form_valid(form)
 
 
 class LoginView(DjangoLoginView):
@@ -221,3 +226,24 @@ class FollowingsListView(generic.ListView):
         context["follower_or_following"] = "Followings"
         context["current_username"] = self.kwargs.get("username")
         return context
+
+
+class FinalizeSignupView(generic.UpdateView):
+    success_url = reverse_lazy("account:timeline")
+    form_class = forms.SignupForm
+    template_name = "account/finalize-signup.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_new_google_user:
+            return redirect("account:timeline")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        form.instance.is_new_google_user = False
+        valid_form = super().form_valid(form)
+        self.request.user.backend = "django.contrib.auth.backends.ModelBackend"
+        login(self.request, self.request.user)
+        return valid_form

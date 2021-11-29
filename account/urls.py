@@ -15,6 +15,9 @@ urlpatterns = [
     path("block/", views.BlockUnblockView.as_view(), name="block"),
     path("search/", views.SearchView.as_view(), name="search"),
     path(
+        "finalize-signup/", views.FinalizeSignupView.as_view(), name="finalize-signup"
+    ),
+    path(
         "followings/<str:username>/",
         views.FollowingsListView.as_view(),
         name="followings",
