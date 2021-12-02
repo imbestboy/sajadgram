@@ -56,3 +56,19 @@
     <a href="{% url 'account:signup' %}" class="text-center">I don't have account</a>
 </p>
 {% endblock content %}
+
+
+{% block end-body %}
+
+{% if messages %}
+<script>
+    $(document).Toasts('create', {
+        class: 'bg-success',
+        title: "Your Account Created ",
+        subtitle: ' ',
+        body: '{% for message in messages %} {{message}}<br />{% endfor %}'
+    });
+</script>
+{% endif %}
+
+{% endblock end-body %}

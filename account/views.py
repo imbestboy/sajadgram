@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.views import generic
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 from django.contrib.auth.views import (
     LoginView as DjangoLoginView,
     PasswordResetView as DjangoPasswordResetView,
@@ -13,7 +13,7 @@ from django.contrib.auth.views import (
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.contrib.auth import login
+from django.contrib.messages.views import SuccessMessageMixin
 
 from . import forms
 from . import models
@@ -21,11 +21,12 @@ from post.models import Post
 from utilities.views import DoUndoWithAjaxView
 
 
-class SignupView(generic.CreateView):
+class SignupView(SuccessMessageMixin, generic.CreateView):
     template_name = "account/signup.html"
     model = get_user_model()
     form_class = forms.SignupForm
     success_url = reverse_lazy(settings.LOGIN_URL)
+    success_message = "your account has been created you can login now"
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -49,12 +50,13 @@ class TimeLineView(generic.ListView):
     model = Post
 
     def queryset(self):
-        followed_users = (
+        followed_users = [
             followed_user.to_user
             for followed_user in models.Follow.objects.filter(
                 from_user=self.request.user, is_active=True
             )
-        )
+        ]
+        followed_users += [self.request.user]
         return Post.objects.filter(user__in=followed_users).order_by("created_time")
 
 
@@ -92,9 +94,10 @@ class ProfileView(generic.DetailView):
         return context
 
 
-class EditProfileView(generic.UpdateView):
+class EditProfileView(SuccessMessageMixin, generic.UpdateView):
     template_name = "account/edit-profile.html"
     form_class = forms.EditProfileForm
+    success_message = "your profile successfully updated"
 
     def dispatch(self, *args, **kwargs):
         self.success_url = reverse_lazy(
@@ -234,10 +237,11 @@ class FollowingsListView(generic.ListView):
         return context
 
 
-class FinalizeSignupView(generic.UpdateView):
+class FinalizeSignupView(SuccessMessageMixin, generic.UpdateView):
     success_url = reverse_lazy("account:timeline")
     form_class = forms.SignupForm
     template_name = "account/finalize-signup.html"
+    success_message = "username and password successfully set"
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_new_google_user:
@@ -255,23 +259,23 @@ class FinalizeSignupView(generic.UpdateView):
         return valid_form
 
 
-class PasswordResetView(DjangoPasswordResetView):
+class PasswordResetView(SuccessMessageMixin, DjangoPasswordResetView):
     email_template_name = "account/resetpassword/reset-password-email.html"
     html_email_template_name = None
     subject_template_name = "account/resetpassword/reset-password-subject.txt"
-    success_url = reverse_lazy("account:reset-password-done")
+    success_url = reverse_lazy("account:reset-password")
     template_name = "account/resetpassword/reset-password-view.html"
     form_class = forms.ResetPasswordForm
+    success_message = "If you don’t receive an email, please make sure you’ve entered the address you registered with, and check your spam folder."
 
 
-class PasswordResetDoneView(DjangoPasswordResetDoneView):
-    template_name = "account/resetpassword/reset-password-done.html"
-
-
-class PasswordResetConfirmView(DjangoPasswordResetConfirmView):
+class PasswordResetConfirmView(SuccessMessageMixin, DjangoPasswordResetConfirmView):
     form_class = forms.SetPasswordForm
-    success_url = reverse_lazy("account:reset-password-complete")
     template_name = "account/resetpassword/reset-password-confirm.html"
+    success_message = "your password has been reset, you can login with new password"
+
+    def get_success_url(self):
+        return reverse_lazy("account:reset-password-confirm", kwargs={**self.kwargs})
 
 
 class PasswordResetCompleteView(DjangoPasswordResetCompleteView):

@@ -1,5 +1,6 @@
 from django.views import generic
 from django.urls import reverse_lazy
+from django.contrib.messages.views import SuccessMessageMixin
 
 from account.models import Block
 from utilities.views import DoUndoWithAjaxView
@@ -7,11 +8,12 @@ from . import forms
 from . import models
 
 
-class CreatePostView(generic.CreateView):
+class CreatePostView(SuccessMessageMixin, generic.CreateView):
     success_url = reverse_lazy("account:timeline")
     template_name = "post/create.html"
     form_class = forms.CreatePostForm
     model = models.Post
+    success_message = "your post has been created successfully"
 
     def form_valid(self, form):
         form.instance.user = self.request.user

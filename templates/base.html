@@ -264,6 +264,17 @@
 
     {% block end-body %}
     {% endblock end-body %}
+
+    {% if messages %}
+    <script>
+        $(document).Toasts('create', {
+            class: 'bg-success',
+            title: "Changes Successfully Saved ",
+            subtitle: ' ',
+            body: '{% for message in messages %} {{message}}<br />{% endfor %}'
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>
