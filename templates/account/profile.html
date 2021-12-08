@@ -64,7 +64,9 @@
 
             {% if account.username != request.user.username and not is_block %}
             <div class="row justify-content-between">
-                {% if is_followed %}
+                {% if is_requested and is_followed %}
+                <button type="button" class="btn bg-gradient-info mt-4 col-3" id="follow">Requested</button>
+                {% elif is_followed and not is_requested %}
                 <button type="button" class="btn btn-outline-primary mt-4 col-3" id="follow">Unfollow</button>
                 {% else %}
                 <button type="button" class="btn bg-gradient-primary mt-4 col-3" id="follow">Follow</button>
@@ -141,11 +143,17 @@
                         .text('Unfollow');
                     var follower_count = Number($("#follower_count").text());
                     $("#follower_count").text(String(++follower_count));
-                } else {
-                    $("#follow").removeClass("btn-outline-primary").addClass("bg-gradient-primary")
+                } else if (data === "False" || data == "False request") {
+                    $("#follow").removeClass("btn-outline-primary bg-gradient-info").addClass(
+                            "bg-gradient-primary")
                         .text('Follow');
-                    var follower_count = Number($("#follower_count").text());
-                    $("#follower_count").text(String(--follower_count));
+                    if (data == "False") {
+                        var follower_count = Number($("#follower_count").text());
+                        $("#follower_count").text(String(--follower_count));
+                    }
+                } else {
+                    $("#follow").removeClass("bg-gradient-primary").addClass("bg-gradient-info")
+                        .text('Requested');
                 }
             }
         });

@@ -1,8 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 
-from account.models import Block
+from account.models import Block, Follow
 from utilities.views import DoUndoWithAjaxView
 from . import forms
 from . import models
@@ -73,7 +74,19 @@ class UserPostList(generic.ListView):
     model = models.Post
 
     def get_queryset(self):
-        return models.Post.objects.filter(user__username=self.kwargs.get("username"))
+        user = get_user_model().objects.get(username=self.kwargs.get("username"))
+        all_posts = models.Post.objects.filter(user=user)
+        if not user.is_private:
+            return all_posts
+        else:
+            if Follow.objects.filter(
+                from_user=self.request.user,
+                to_user=user,
+                is_active=True,
+                is_requested=False,
+            ):
+                return all_posts
+        return []
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

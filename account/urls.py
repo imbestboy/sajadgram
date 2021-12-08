@@ -11,6 +11,9 @@ urlpatterns = [
     path("logout/", view=LogoutView.as_view(), name="logout"),
     path("", view=views.TimeLineView.as_view(), name="timeline"),
     path("edit-profile/", views.EditProfileView.as_view(), name="edit-profile"),
+    path(
+        "change-password/", views.ChangePasswordView.as_view(), name="change-password"
+    ),
     path("follow/", views.FollowUnfollowView.as_view(), name="follow"),
     path("block/", views.BlockUnblockView.as_view(), name="block"),
     path("search/", views.SearchView.as_view(), name="search"),

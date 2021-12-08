@@ -4,12 +4,12 @@ from django.views import generic
 from django.conf import settings
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.views import (
+    PasswordChangeView,
     LoginView as DjangoLoginView,
     PasswordResetView as DjangoPasswordResetView,
-    PasswordResetDoneView as DjangoPasswordResetDoneView,
     PasswordResetConfirmView as DjangoPasswordResetConfirmView,
-    PasswordResetCompleteView as DjangoPasswordResetCompleteView,
 )
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -75,10 +75,10 @@ class ProfileView(generic.DetailView):
             user__username=current_username
         ).count()
         context["following_count"] = models.Follow.objects.filter(
-            from_user__username=current_username, is_active=True
+            from_user__username=current_username, is_active=True, is_requested=False
         ).count()
         context["follower_count"] = models.Follow.objects.filter(
-            to_user__username=current_username, is_active=True
+            to_user__username=current_username, is_active=True, is_requested=False
         ).count()
         context["is_block"] = models.Block.objects.filter(
             from_user=self.request.user,
@@ -86,11 +86,16 @@ class ProfileView(generic.DetailView):
             is_active=True,
         ).exists()
         if current_username != self.request.user.username:
-            context["is_followed"] = models.Follow.objects.filter(
+            follow = models.Follow.objects.filter(
                 to_user__username=current_username,
                 from_user=self.request.user,
-                is_active=True,
-            ).exists()
+            )
+            context["is_followed"] = (
+                follow.get().is_active if follow.exists() else False
+            )
+            context["is_requested"] = (
+                follow.get().is_requested if follow.exists() else False
+            )
         return context
 
 
@@ -127,19 +132,41 @@ class FollowUnfollowView(DoUndoWithAjaxView):
     model = models.Follow
     permission_denied_message = "You cant follow your self !"
 
+    def post(self, request):
+        response = super().post(request)
+        is_do = response.content.decode("utf-8")
+        if is_do == "True" and self.to_user.is_private:
+            response = HttpResponse("request")
+        if is_do == "False" and self.to_user.is_private:
+            response = HttpResponse("False request")
+        return response
+
     def get_check_dict(self):
+        self.to_user = get_user_model().objects.get(
+            username=self.request.POST.get("username")
+        )
         current_username = self.request.POST.get("username")
         if self.request.user.username == current_username:
             raise PermissionDenied(self.permission_denied_message)
         return {"from_user": self.request.user, "to_user__username": current_username}
 
     def get_create_dict(self):
-        return {
-            "from_user": self.request.user,
-            "to_user": get_user_model().objects.get(
-                username=self.request.POST.get("username")
-            ),
-        }
+        self.to_user = get_user_model().objects.get(
+            username=self.request.POST.get("username")
+        )
+        return (
+            {
+                "from_user": self.request.user,
+                "to_user": self.to_user,
+                "is_requested": True,
+            }
+            if self.to_user.is_private
+            else {
+                "from_user": self.request.user,
+                "to_user": self.to_user,
+                "is_requested": False,
+            }
+        )
 
 
 class BlockUnblockView(FollowUnfollowView):
@@ -278,5 +305,8 @@ class PasswordResetConfirmView(SuccessMessageMixin, DjangoPasswordResetConfirmVi
         return reverse_lazy("account:reset-password-confirm", kwargs={**self.kwargs})
 
 
-class PasswordResetCompleteView(DjangoPasswordResetCompleteView):
-    template_name = "account/resetpassword/reset-password-complete.html"
+class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+    template_name = "account/change-password.html"
+    success_url = reverse_lazy("account:change-password")
+    form_class = forms.ChangePasswordForm
+    success_message = "password has been changed successfully"

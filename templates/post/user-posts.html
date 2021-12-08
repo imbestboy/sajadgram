@@ -14,7 +14,7 @@
 {% if posts|length == 0 %}
 <div class="alert alert-info alert-dismissible">
     <h5><i class="icon fas fa-info"></i> Oops posts not found !</h5>
-    {{current_username}} have not post
+    {{current_username}} have not post or account is private follow {{current_username}} first
 </div>
 {% else %}
 {% show_posts posts %}

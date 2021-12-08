@@ -238,13 +238,16 @@ Edit Profile
                     </blockquote>
                     {% endif %}
                 </div>
+                <div class="col-lg-2 col-sm-4 col-md-5 col-xsm-6 mt-2">
+                    <a class="link-primary" href="{% url 'account:change-password' %}">change password</a>
+                </div>
             </div>
         </div>
 
     </div>
 
     <div class="card-footer bg-light">
-        <button type="submit" class="btn btn-primary col-2">Save</button>
+        <button type="submit" class="btn btn-primary col-sm-4 col-md-4 col-lg-2">Save</button>
     </div>
 </form>
 {% endblock content %}

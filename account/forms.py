@@ -2,6 +2,7 @@ from django.contrib.auth.forms import (
     AuthenticationForm,
     UserCreationForm,
     PasswordResetForm,
+    PasswordChangeForm,
     SetPasswordForm as DjangoSetPasswordForm,
 )
 from django.contrib.auth import get_user_model
@@ -247,5 +248,19 @@ class SetPasswordForm(DjangoSetPasswordForm):
             attrs={"placeholder": "New Password", "class": "form-control"}
         )
         self.fields["new_password2"].widget = forms.PasswordInput(
-            attrs={"placeholder": "Confirmation Password", "class": "form-control"}
+            attrs={"placeholder": "Confirmation New Password", "class": "form-control"}
+        )
+
+
+class ChangePasswordForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["old_password"].widget = forms.PasswordInput(
+            attrs={"placeholder": "Old Password", "class": "form-control"}
+        )
+        self.fields["new_password1"].widget = forms.PasswordInput(
+            attrs={"placeholder": "New Password", "class": "form-control"}
+        )
+        self.fields["new_password2"].widget = forms.PasswordInput(
+            attrs={"placeholder": "Confirmation New Password", "class": "form-control"}
         )

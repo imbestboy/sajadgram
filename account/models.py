@@ -105,6 +105,7 @@ class Follow(models.Model):
         verbose_name="from user",
         related_name="from_user",
     )
+    is_requested = models.BooleanField(_("is request to follow"))
     is_active = models.BooleanField(_("is followed"), default=True)
     created_time = models.DateTimeField(
         _("follow time"), auto_now=False, auto_now_add=True
