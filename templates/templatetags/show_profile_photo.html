@@ -1,0 +1,6 @@
+{% load static %}
+{% if account.profile_photo %}
+<img class="{{classes}}" src="{{account.profile_photo.url}}" alt="{{alt}}">
+{% else %}
+<img class="{{classes}}" src="{% static 'images/default/profile.jpeg' %}" alt="Default {{alt}}">
+{% endif %}

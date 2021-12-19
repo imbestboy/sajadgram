@@ -1,10 +1,10 @@
+{% load show_profile_photo %}
 {% for account in accounts %}
 <a class="text-dark" href="{% url 'account:profile' username=account.username %}">
     <div class="list-group-item">
         <div class="row">
-            <div class="col-auto">
-                <img class="img-fluid img-circle" src="{{account.profile_photo.url}}" alt="User Avatar"
-                    style="max-height: 160px;">
+            <div class="w-25 col-xl-1">
+                {% show_profile_photo account "img-fluid img-circle" "User Avatar" %}
             </div>
             <div class="col px-4">
                 <div>

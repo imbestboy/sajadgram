@@ -66,6 +66,8 @@ class EditProfileForm(forms.ModelForm):
         self.user = user
         self.fields["date_joined"].disabled = True
         self.fields["username"].disabled = True
+        self.fields["background_photo"].required = False
+        self.fields["profile_photo"].required = False
         self.change_html_attribute(
             "username",
             {"class": "form-control"},
@@ -199,6 +201,8 @@ class EditProfileForm(forms.ModelForm):
 
     def clean_profile_photo(self):
         profile_photo = self.cleaned_data.get("profile_photo")
+        if profile_photo is None:
+            return None
         width, height = get_image_dimensions(profile_photo)
         if width / height != 1.0:
             self.add_error("profile_photo", "Profile photo should be square")
@@ -211,6 +215,8 @@ class EditProfileForm(forms.ModelForm):
 
     def clean_background_photo(self):
         background_photo = self.cleaned_data.get("background_photo")
+        if background_photo is None:
+            return None
         width, height = get_image_dimensions(background_photo)
         if width / height > 2.0 or width / height < 1.25:
             self.add_error(

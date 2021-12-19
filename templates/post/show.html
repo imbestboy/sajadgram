@@ -1,5 +1,5 @@
 {% extends '../base.html' %}
-
+{% load show_profile_photo %}
 
 {% block title %}
 SajadGram | Show Post
@@ -15,7 +15,8 @@ SajadGram | Show Post
     <div class="card card-widget">
         <div class="card-header">
             <div class="user-block">
-                <img class="img-circle img-fluid" src="{{post.user.profile_photo.url}}" alt="User Image">
+
+                {% show_profile_photo post.user "img-circle img-fluid" "User Avatar" %}
                 <span class="username"><a
                         href="{% url 'account:profile' username=post.user.username %}">{{post.user.username}}</a></span>
                 <span class="description">{{post.created_time}}</span>

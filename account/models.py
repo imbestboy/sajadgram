@@ -79,12 +79,10 @@ class User(AbstractUser):
         _("gender"), max_length=1, choices=Gender.choices, default=Gender.UNSET
     )
     profile_photo = models.ImageField(
-        upload_to=partial(save_image_path, is_background=False),
-        default="profile/default.jpeg",
+        upload_to=partial(save_image_path, is_background=False), null=True, default=None
     )
     background_photo = models.ImageField(
-        upload_to=partial(save_image_path, is_background=True),
-        default="background/default.jpeg",
+        upload_to=partial(save_image_path, is_background=True), null=True, default=None
     )
 
     @property

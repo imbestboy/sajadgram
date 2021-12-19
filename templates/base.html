@@ -1,4 +1,5 @@
 {% load static %}
+{% load show_profile_photo %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -88,8 +89,7 @@
                 <!-- Sidebar user panel (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="{{ request.user.profile_photo.url }}" class="img-circle elevation-2"
-                            alt="User Image" />
+                        {% show_profile_photo request.user "img-circle elevation-2" "User Avatar" %}
                     </div>
                     <div class="info">
                         <a href="{% url 'account:profile' username=request.user.username %}"
