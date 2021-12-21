@@ -32,3 +32,12 @@ class SavePostAdmin(admin.ModelAdmin):
     @admin.display()
     def display_name(self, obj):
         return obj.post.display_name
+
+
+@admin.register(models.Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("username", "text", "created_time", "is_active")
+
+    @admin.display()
+    def username(self, obj):
+        return obj.user.username

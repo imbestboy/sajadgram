@@ -64,3 +64,22 @@ class LikedPost(models.Model):
 
     def __str__(self):
         return f"{self.user.username} Liked {self.post.display_name} , {self.is_active}"
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(
+        get_user_model(), verbose_name=_("comment writer"), on_delete=models.CASCADE
+    )
+    post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
+    text = models.CharField(max_length=255)
+    created_time = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, related_name="replies", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        ordering = ("-created_time",)
+
+    def __str__(self):
+        return "Comment by {}".format(self.name)

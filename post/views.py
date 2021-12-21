@@ -41,12 +41,19 @@ class LikedPostListView(generic.ListView):
         return models.LikedPost.objects.filter(user=self.request.user, is_active=True)
 
 
-class ShowPostView(generic.DetailView):
+class ShowPostView(SuccessMessageMixin, generic.DetailView, generic.CreateView):
+    form_class = forms.CommentForm
+    success_message = "Comment successfully sended"
     template_name = "post/show.html"
     model = models.Post
     context_object_name = "post"
 
-    def get_object(self, *args, **kwargs):
+    def get_success_url(self):
+        return reverse_lazy(
+            "post:show", kwargs={"display_name": self.kwargs.get("display_name")}
+        )
+
+    def get_object(self):
         return models.Post.objects.get(display_name=self.kwargs.get("display_name"))
 
     def get_context_data(self, *args, **kwargs):
@@ -65,7 +72,26 @@ class ShowPostView(generic.DetailView):
         context["liked_count"] = models.LikedPost.objects.filter(
             post__display_name=display_name, is_active=True
         ).count()
+        context["comments"] = self.object.comments.filter(
+            active=True, parent__isnull=True
+        )
         return context
+
+    def form_valid(self, form):
+        parent_obj = None
+        try:
+            parent_id = int(self.request.POST.get("parent_id"))
+            parent_obj = models.Comment.objects.get(id=parent_id)
+            replay_comment = form.save(commit=False)
+            replay_comment.parent = parent_obj
+        except (TypeError, models.Comment.DoesNotExist):
+            parent_id = None
+
+        new_comment = form.save(commit=False)
+        new_comment.post = self.get_object()
+        new_comment.user = self.request.user
+        new_comment.save()
+        return super().form_valid(form)
 
 
 class UserPostList(generic.ListView):
@@ -96,6 +122,20 @@ class UserPostList(generic.ListView):
 
 class SaveUnsaveView(DoUndoWithAjaxView):
     model = models.SavedPost
+
+    def get_check_dict(self):
+        return {
+            "post__display_name": self.request.POST.get("display_name"),
+            "user": self.request.user,
+        }
+
+    def get_create_dict(self):
+        return {
+            "user": self.request.user,
+            "post": models.Post.objects.get(
+                display_name=self.request.POST.get("display_name")
+            ),
+        }
 
 
 class LikeUnlikeView(DoUndoWithAjaxView):

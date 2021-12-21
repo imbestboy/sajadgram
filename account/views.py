@@ -198,6 +198,11 @@ class BlockUnblockView(FollowUnfollowView):
             except models.Follow.DoesNotExist:
                 pass
 
+    def get_create_dict(self):
+        super_dict = super().get_create_dict()
+        del super_dict["is_requested"]
+        return super_dict
+
 
 class SearchView(generic.ListView):
     paginate_by = 15

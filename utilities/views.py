@@ -7,7 +7,6 @@ from django.views import generic
 from post import models
 
 
-@method_decorator(csrf_exempt, name="dispatch")
 class DoUndoWithAjaxView(generic.View):
     model = None
     check_dict = None

@@ -44,3 +44,18 @@ class CreatePostForm(forms.ModelForm):
                 "Post photo too small , width and height must be greater than 299",
             )
         return media
+
+
+class CommentForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["text"].widget = forms.TextInput(
+            attrs={
+                "placeholder": "write your comment and press enter ...",
+                "class": "form-control form-control-sm",
+            }
+        )
+
+    class Meta:
+        model = models.Comment
+        fields = ("text",)

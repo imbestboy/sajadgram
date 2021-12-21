@@ -30,7 +30,7 @@
         <div class="widget-user-image profile-photo">
 
             {% if is_block %}
-            <img class="img-circle img-fluid profile-photo-img" src="{% static 'images/default/block.jpeg' %}"
+            <img class="img-circle img-fluid profile-photo-img" src="{% static 'images/default/profile_block.jpeg' %}"
                 alt="Blocked Avatar">
             {% else %}
 
@@ -138,7 +138,12 @@
         $.ajax({
             url: "{% url 'account:follow' %}",
             type: 'post',
-            data: JSON.parse('{"username":"{{account.username}}"}'),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}");
+            },
+            data: {
+                "username": "{{account.username}}"
+            },
             success: function (data) {
                 if (data === "True") {
                     $("#follow").removeClass("bg-gradient-primary").addClass("btn-outline-primary")
@@ -164,7 +169,12 @@
         $.ajax({
             url: "{% url 'account:block' %}",
             type: 'post',
-            data: JSON.parse('{"username":"{{account.username}}"}'),
+            data: {
+                "username": "{{account.username}}"
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}");
+            },
             success: function (data) {
                 location.reload();
             }
