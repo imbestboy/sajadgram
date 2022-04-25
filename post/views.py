@@ -73,7 +73,7 @@ class ShowPostView(SuccessMessageMixin, generic.DetailView, generic.CreateView):
             post__display_name=display_name, is_active=True
         ).count()
         context["comments"] = self.object.comments.filter(
-            active=True, parent__isnull=True
+            is_active=True, parent__isnull=True
         )
         return context
 
@@ -109,7 +109,7 @@ class UserPostList(generic.ListView):
                 from_user=self.request.user,
                 to_user=user,
                 is_active=True,
-                is_requested=False,
+                status=2,
             ):
                 return all_posts
         return []
@@ -168,4 +168,9 @@ class ExploreView(generic.ListView):
                 from_user=self.request.user, is_active=True
             )
         )
-        return self.model.objects.all().exclude(user__in=blocked_users).order_by("?")
+        return (
+            self.model.objects.all()
+            .filter(user__is_private=False)
+            .exclude(user__in=blocked_users)
+            .order_by("?")
+        )

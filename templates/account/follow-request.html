@@ -1,0 +1,124 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load show_profile_photo %}
+
+{% block title %}
+SajadGram | Follow Requests
+{% endblock title %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'account/css/search.css' %}">
+
+{% endblock head %}
+
+{% block content-header %}
+Follow Requests
+{% endblock content-header %}
+
+
+{% block content %}
+<div class="row mt-3">
+    <div class="col-md-10 offset-md-1">
+        <div class="list-group">
+
+            {% if requests|length == 0 %}
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col px-4">
+                        <div>
+                            <h3>User Not Found !</h3>
+                            <p class="mb-0">Nobody want to follow you</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            {% for account in requests %}
+            <a class="text-dark" href="{% url 'account:profile' username=account.from_user.username %}"
+                id="{{account.from_user.username}}">
+                <div class="list-group-item">
+                    <div class="row">
+                        <div class="w-25 col-xl-1">
+                            {% show_profile_photo account.from_user "img-fluid img-circle" "User Avatar" %}
+                        </div>
+                        <div class="col px-4">
+                            <div>
+                                <h3>{{account.from_user.username}}</h3>
+                                <p class="mb-1">
+                                    {% if account.from_user.get_full_name %}
+                                    {{account.from_user.get_full_name}}
+                                    {% else %}
+                                    full name
+                                    {% endif %}
+                                </p>
+                                <p class="mb-0">
+                                    {% if account.from_user.bio %}
+                                    {{account.from_user.bio}}
+                                    {% else %}
+                                    Bio
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="float-right">
+                        <a class="btn btn-app bg-success pl-2 accept-follow-request"
+                            value="{{account.from_user.username}}">
+                            <i class="fas fa-user-check pl-2"></i> Accept
+                        </a>
+                        <a class="btn btn-app bg-danger pl-2 decline-follow-request"
+                            value="{{account.from_user.username}}">
+                            <i class="fas fa-user-times pl-1"></i> Decline
+                        </a>
+                    </div>
+                </div>
+
+            </a>
+            {% endfor %}
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block end-body %}
+<script>
+    $(".accept-follow-request").click(function () {
+        var username = $(this).attr("value")
+        $.ajax({
+            url: "{% url 'account:accept-decline-request' %}",
+            type: 'post',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}");
+            },
+            data: {
+                "username": username,
+                "type": "accept",
+            },
+            success: function (data) {
+                location.reload()
+            }
+        });
+    });
+    $(".decline-follow-request").click(function () {
+        var username = $(this).attr("value")
+        $.ajax({
+            url: "{% url 'account:accept-decline-request' %}",
+            type: 'post',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}");
+            },
+            data: {
+                "username": username,
+                "type": "decline",
+            },
+            success: function (data) {
+                location.reload()
+            }
+        });
+    });
+</script>
+{% endblock end-body %}

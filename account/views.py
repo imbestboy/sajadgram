@@ -9,7 +9,7 @@ from django.contrib.auth.views import (
     PasswordResetView as DjangoPasswordResetView,
     PasswordResetConfirmView as DjangoPasswordResetConfirmView,
 )
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -75,10 +75,10 @@ class ProfileView(generic.DetailView):
             user__username=current_username
         ).count()
         context["following_count"] = models.Follow.objects.filter(
-            from_user__username=current_username, is_active=True, is_requested=False
+            from_user__username=current_username, is_active=True, status=2
         ).count()
         context["follower_count"] = models.Follow.objects.filter(
-            to_user__username=current_username, is_active=True, is_requested=False
+            to_user__username=current_username, is_active=True, status=2
         ).count()
         context["is_block"] = models.Block.objects.filter(
             from_user=self.request.user,
@@ -93,9 +93,7 @@ class ProfileView(generic.DetailView):
             context["is_followed"] = (
                 follow.get().is_active if follow.exists() else False
             )
-            context["is_requested"] = (
-                follow.get().is_requested if follow.exists() else False
-            )
+            context["status"] = follow.get().status if follow.exists() else False
         return context
 
 
@@ -135,9 +133,30 @@ class FollowUnfollowView(DoUndoWithAjaxView):
     def post(self, request):
         response = super().post(request)
         is_do = response.content.decode("utf-8")
-        if is_do == "True" and self.to_user.is_private:
+        if (
+            is_do == "True"
+            and self.to_user.is_private
+            and request.POST.get("is_cancel_request") == "false"
+        ):
             response = HttpResponse("request")
-        if is_do == "False" and self.to_user.is_private:
+            self.do_model_instance.is_active = True
+            self.do_model_instance.status = 1
+            self.do_model_instance.save()
+        elif (
+            is_do == "True"
+            and not self.to_user.is_private
+            and request.POST.get("is_cancel_request") == "false"
+        ):
+            response = HttpResponse("True")
+            self.do_model_instance.is_active = True
+            self.do_model_instance.status = 2
+            self.do_model_instance.save()
+        else:
+            response = HttpResponse("False")
+            self.do_model_instance.is_active = False
+            self.do_model_instance.status = 0
+            self.do_model_instance.save()
+        if request.POST.get("is_cancel_request") == "true":
             response = HttpResponse("False request")
         return response
 
@@ -158,20 +177,27 @@ class FollowUnfollowView(DoUndoWithAjaxView):
             {
                 "from_user": self.request.user,
                 "to_user": self.to_user,
-                "is_requested": True,
+                "status": 1,
             }
             if self.to_user.is_private
             else {
                 "from_user": self.request.user,
                 "to_user": self.to_user,
-                "is_requested": False,
+                "status": 2,
             }
         )
 
 
-class BlockUnblockView(FollowUnfollowView):
+class BlockUnblockView(DoUndoWithAjaxView):
     model = models.Block
     permission_denied_message = "You cant block your self !"
+
+    def get_check_dict(self):
+        self.to_user = get_user_model().objects.get(
+            username=self.request.POST.get("username")
+        )
+        current_username = self.request.POST.get("username")
+        return {"from_user": self.request.user, "to_user__username": current_username}
 
     def post(self, *args, **kwargs):
         super_post = super().post(*args, **kwargs)
@@ -188,6 +214,10 @@ class BlockUnblockView(FollowUnfollowView):
                 )
                 followed.is_active = False
                 followed.save()
+            except models.Follow.DoesNotExist:
+                pass
+
+            try:
                 followed = models.Follow.objects.get(
                     from_user__username=self.request.POST.get("username"),
                     to_user=self.request.user,
@@ -199,9 +229,10 @@ class BlockUnblockView(FollowUnfollowView):
                 pass
 
     def get_create_dict(self):
-        super_dict = super().get_create_dict()
-        del super_dict["is_requested"]
-        return super_dict
+        self.to_user = get_user_model().objects.get(
+            username=self.request.POST.get("username")
+        )
+        return {"from_user": self.request.user, "to_user": self.to_user}
 
 
 class SearchView(generic.ListView):
@@ -315,3 +346,47 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     success_url = reverse_lazy("account:change-password")
     form_class = forms.ChangePasswordForm
     success_message = "password has been changed successfully"
+
+
+class FollowRequestView(generic.ListView):
+    template_name = "account/follow-request.html"
+    paginate_by = 30
+    context_object_name = "requests"
+    model = models.Follow
+
+    def get_queryset(self):
+        return self.model.objects.filter(
+            status=1, is_active=True, to_user=self.request.user
+        )
+
+
+class AcceptDeclineRequestView(generic.View):
+    model = models.Follow
+    check_dict = None
+
+    def post(self, request):
+        if request.is_ajax():
+            model = self.model
+            self.do_model_instance = model.objects.get(**self.get_check_dict())
+            if self.request.POST.get("type") == "accept":
+                self.do_model_instance.is_active, self.do_model_instance.status = (
+                    True,
+                    2,
+                )
+            else:
+                self.do_model_instance.is_active, self.do_model_instance.status = (
+                    False,
+                    0,
+                )
+            self.do_model_instance.save()
+
+            return HttpResponse("Done")
+        else:
+            raise Http404
+
+    def get_check_dict(self):
+        self.to_user = get_user_model().objects.get(
+            username=self.request.POST.get("username")
+        )
+        current_username = self.request.POST.get("username")
+        return {"from_user__username": current_username, "to_user": self.request.user}

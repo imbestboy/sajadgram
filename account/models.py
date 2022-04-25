@@ -103,7 +103,9 @@ class Follow(models.Model):
         verbose_name="from user",
         related_name="from_user",
     )
-    is_requested = models.BooleanField(_("is request to follow"))
+    status = models.PositiveSmallIntegerField(
+        _("status of follow (0 - unfollow , 1 - requested , 2 - follow)")
+    )
     is_active = models.BooleanField(_("is followed"), default=True)
     created_time = models.DateTimeField(
         _("follow time"), auto_now=False, auto_now_add=True

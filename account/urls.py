@@ -36,5 +36,11 @@ urlpatterns = [
         views.PasswordResetConfirmView.as_view(),
         name="reset-password-confirm",
     ),
+    path("follow-requests/", views.FollowRequestView.as_view(), name="follow-request"),
+    path(
+        "follow-request/",
+        views.AcceptDeclineRequestView.as_view(),
+        name="accept-decline-request",
+    ),
     path("<str:username>/", views.ProfileView.as_view(), name="profile"),
 ]

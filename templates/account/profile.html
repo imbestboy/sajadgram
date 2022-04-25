@@ -66,9 +66,9 @@
 
             {% if account.username != request.user.username and not is_block %}
             <div class="row justify-content-between">
-                {% if is_requested and is_followed %}
+                {% if status == 1 %}
                 <button type="button" class="btn bg-gradient-info mt-4 col-3" id="follow">Requested</button>
-                {% elif is_followed and not is_requested %}
+                {% elif status == 2 %}
                 <button type="button" class="btn btn-outline-primary mt-4 col-3" id="follow">Unfollow</button>
                 {% else %}
                 <button type="button" class="btn bg-gradient-primary mt-4 col-3" id="follow">Follow</button>
@@ -142,7 +142,8 @@
                 xhr.setRequestHeader("X-CSRFToken", "{{csrf_token}}");
             },
             data: {
-                "username": "{{account.username}}"
+                "username": "{{account.username}}",
+                "is_cancel_request": $("#follow").text() == "Requested"
             },
             success: function (data) {
                 if (data === "True") {

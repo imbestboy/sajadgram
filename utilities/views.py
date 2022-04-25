@@ -1,25 +1,22 @@
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, Http404
 from django.core.exceptions import ImproperlyConfigured
 from django.views import generic
-
-from post import models
 
 
 class DoUndoWithAjaxView(generic.View):
     model = None
     check_dict = None
+    create_dict = None
 
     def post(self, request):
         if request.is_ajax():
             model = self.get_model()
             try:
-                do_model_instance = model.objects.get(**self.get_check_dict())
-                do_model_instance.is_active, is_do = (
-                    (False, False) if do_model_instance.is_active else (True, True)
+                self.do_model_instance = model.objects.get(**self.get_check_dict())
+                self.do_model_instance.is_active, is_do = (
+                    (False, False) if self.do_model_instance.is_active else (True, True)
                 )
-                do_model_instance.save()
+                self.do_model_instance.save()
             except model.DoesNotExist:
                 model.objects.create(
                     **self.get_create_dict(),
